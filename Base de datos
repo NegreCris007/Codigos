@@ -1,0 +1,17 @@
+-- Crear la base de datos
+CREATE DATABASE IF NOT EXISTS inventario;
+
+-- Usar la base de datos creada
+USE inventario;
+
+-- Crear la tabla con los atributos solicitados
+CREATE TABLE IF NOT EXISTS id_incremtable (
+    id INT AUTO_INCREMENT PRIMARY KEY,  -- Clave primaria autoincremental
+    cedula VARCHAR(20) NOT NULL UNIQUE,  -- Cédula como campo único
+    nombre VARCHAR(100) NOT NULL,        -- Nombre completo
+    departamento VARCHAR(50) NOT NULL,   -- Departamento
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Fecha de creación
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- Última actualización
+    deleted_at TIMESTAMP NULL DEFAULT NULL,  -- Fecha de eliminación lógica (puede ser NULL)
+    password VARCHAR(255) NOT NULL  -- Contraseña cifrada
+);
