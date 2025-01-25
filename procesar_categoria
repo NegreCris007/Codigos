@@ -1,0 +1,21 @@
+<?php
+require 'conexion.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $categoria = trim($_POST['categoria']);
+
+    if (empty($categoria)) {
+        echo "El campo de categoría es obligatorio.";
+        exit();
+    }
+
+    try {
+        $stmt = $conexion->prepare("INSERT INTO categorias (nombre) VALUES (:categoria)");
+        $stmt->bindParam(":categoria", $categoria, PDO::PARAM_STR);
+        $stmt->execute();
+        echo "Categoría agregada con éxito.";
+    } catch (PDOException $e) {
+        echo "Error al agregar la categoría: " . $e->getMessage();
+    }
+}
+?>
