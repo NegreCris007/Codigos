@@ -1,0 +1,88 @@
+<!-- Sección de Artículos -->
+<div id="articulos" style="display: none; margin-top: 20px;">
+    <h2>Lista de Artículos</h2>
+
+    <!-- Botón para mostrar el formulario de registro -->
+    <button class="btn-submit" onclick="showArticuloForm()">Registrar Nuevo Artículo</button>
+
+    <!-- Tabla para mostrar los artículos registrados -->
+    <table border="1" style="width: 100%; margin-top: 20px; border-collapse: collapse;">
+        <thead>
+            <tr style="background-color: #343a40; color: white;">
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Fecha de Registro</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            require 'conexion.php';
+
+            try {
+                // Consultar todos los artículos registrados
+                $stmt = $conexion->prepare("SELECT * FROM articulos");
+                $stmt->execute();
+                $articulos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                if ($articulos) {
+                    foreach ($articulos as $articulo) {
+                        echo "<tr>";
+                        echo "<td>" . htmlspecialchars($articulo['id']) . "</td>";
+                        echo "<td>" . htmlspecialchars($articulo['nombre']) . "</td>";
+                        echo "<td>" . htmlspecialchars($articulo['categoria']) . "</td>";
+                        echo "<td>" . htmlspecialchars($articulo['cantidad']) . "</td>";
+                        echo "<td>$" . htmlspecialchars(number_format($articulo['precio'], 2)) . "</td>";
+                        echo "<td>" . htmlspecialchars($articulo['created_at']) . "</td>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='6' style='text-align: center;'>No hay artículos registrados.</td></tr>";
+                }
+            } catch (PDOException $e) {
+                echo "<tr><td colspan='6' style='text-align: center; color: red;'>Error al cargar los artículos: " . htmlspecialchars($e->getMessage()) . "</td></tr>";
+            }
+            ?>
+        </tbody>
+    </table>
+
+    <!-- Formulario de Registro de Artículos -->
+    <div id="articulo-form" style="display: none; margin-top: 20px;">
+        <h2>Registrar Nuevo Artículo</h2>
+        <form action="procesar_articulo.php" method="POST">
+            <div class="input-group">
+                <label for="nombre">Nombre del Artículo:</label>
+                <input type="text" id="nombre" name="nombre" required>
+            </div>
+            <div class="input-group">
+                <label for="categoria">Categoría:</label>
+                <input type="text" id="categoria" name="categoria" required>
+            </div>
+            <div class="input-group">
+                <label for="cantidad">Cantidad:</label>
+                <input type="number" id="cantidad" name="cantidad" required>
+            </div>
+            <div class="input-group">
+                <label for="precio">Precio:</label>
+                <input type="number" step="0.01" id="precio" name="precio" required>
+            </div>
+            <button class="btn-submit" type="submit">Guardar Artículo</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Mostrar el formulario de registro de artículos
+    function showArticuloForm() {
+        const articuloForm = document.getElementById('articulo-form');
+        articuloForm.style.display = 'block';
+    }
+
+    // Mostrar la sección de artículos
+    function showArticulos() {
+        const articulos = document.getElementById('articulos');
+        articulos.style.display = 'block';
+    }
+</script>
