@@ -1,0 +1,118 @@
+<!-- Formulario de Categoría (inicialmente oculto) -->
+<div id="category-form" style="display: none; margin-top: 20px;">
+    <h2>Agregar Nueva Categoría</h2>
+    <form action="procesar_categoria.php" method="POST">
+        <div class="input-group">
+            <label for="codigo">Código:</label>
+            <input type="text" id="codigo" name="codigo" required>
+        </div>
+        <div class="input-group">
+            <label for="descripcion">Descripción:</label>
+            <input type="text" id="descripcion" name="descripcion" required>
+        </div>
+        <button class="btn-submit" type="submit">Guardar Categoría</button>
+    </form>
+</div>
+
+
+
+
+<?php
+require 'conexion.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $codigo = trim($_POST['codigo']);
+    $descripcion = trim($_POST['descripcion']);
+
+    if (empty($codigo) || empty($descripcion)) {
+        echo "<script>alert('Todos los campos son obligatorios.'); window.history.back();</script>";
+        exit();
+    }
+
+    try {
+        $stmt = $conexion->prepare("INSERT INTO categorias (codigo, descripcion) VALUES (:codigo, :descripcion)");
+        $stmt->bindParam(":codigo", $codigo);
+        $stmt->bindParam(":descripcion", $descripcion);
+        $stmt->execute();
+
+        echo "<script>alert('Categoría registrada exitosamente.'); window.location.href='dashboard.php';</script>";
+    } catch (PDOException $e) {
+        echo "<script>alert('Error al registrar la categoría.'); window.history.back();</script>";
+    }
+}
+?>
+
+
+artículo
+
+<!-- Formulario de Artículos (inicialmente oculto) -->
+<div id="article-form" style="display: none; margin-top: 20px;">
+    <h2>Agregar Nuevo Artículo</h2>
+    <form action="procesar_articulo.php" method="POST">
+        <div class="input-group">
+            <label for="nombre">Nombre del Artículo:</label>
+            <input type="text" id="nombre" name="nombre" required>
+        </div>
+        <div class="input-group">
+            <label for="categoria">Categoría:</label>
+            <input type="text" id="categoria" name="categoria" required>
+        </div>
+        <div class="input-group">
+            <label for="cantidad">Cantidad:</label>
+            <input type="number" id="cantidad" name="cantidad" required>
+        </div>
+        <div class="input-group">
+            <label for="precio">Precio:</label>
+            <input type="text" id="precio" name="precio" required>
+        </div>
+        <button class="btn-submit" type="submit">Guardar Artículo</button>
+    </form>
+</div>
+
+
+
+
+
+function showArticleForm() {
+    const articleForm = document.getElementById('article-form');
+    articleForm.style.display = 'block';
+}
+
+
+<?php
+require 'conexion.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $nombre = trim($_POST['nombre']);
+    $categoria = trim($_POST['categoria']);
+    $cantidad = intval($_POST['cantidad']);
+    $precio = floatval($_POST['precio']);
+
+    // Validar que no haya campos vacíos
+    if (empty($nombre) || empty($categoria) || empty($cantidad) || empty($precio)) {
+        header("Location: dashboard.php?error=1"); // Campos vacíos
+        exit();
+    }
+
+    try {
+        // Insertar el artículo en la base de datos
+        $stmt = $conexion->prepare("INSERT INTO articulos (nombre, categoria, cantidad, precio) VALUES (:nombre, :categoria, :cantidad, :precio)");
+        $stmt->bindParam(":nombre", $nombre, PDO::PARAM_STR);
+        $stmt->bindParam(":categoria", $categoria, PDO::PARAM_STR);
+        $stmt->bindParam(":cantidad", $cantidad, PDO::PARAM_INT);
+        $stmt->bindParam(":precio", $precio, PDO::PARAM_STR);
+        $stmt->execute();
+
+        header("Location: dashboard.php?success=1"); // Registro exitoso
+        exit();
+    } catch (PDOException $e) {
+        error_log("Error en el registro: " . $e->getMessage());
+        header("Location: dashboard.php?error=2"); // Error de base de datos
+        exit();
+    }
+} else {
+    header("Location: dashboard.php");
+    exit();
+}
+?>
+
