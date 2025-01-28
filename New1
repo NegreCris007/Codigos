@@ -1,0 +1,68 @@
+<div id="articulo-form" style="display: none; margin-top: 20px;">
+    <h2>Agregar Nuevo Artículo</h2>
+    <form action="procesar_articulo.php" method="POST">
+        <div class="input-group">
+            <label for="nombre">Nombre del Artículo:</label>
+            <input type="text" id="nombre" name="nombre" required>
+        </div>
+        <div class="input-group">
+            <label for="codigo">Código:</label>
+            <input type="text" id="codigo" name="codigo" required>
+        </div>
+        <div class="input-group">
+            <label for="descripcion">Descripción:</label>
+            <input type="text" id="descripcion" name="descripcion" required>
+        </div>
+        <div class="input-group">
+            <label for="marca">Marca:</label>
+            <input type="text" id="marca" name="marca" required>
+        </div>
+        <div class="input-group">
+            <label for="modelo">Modelo:</label>
+            <input type="text" id="modelo" name="modelo" required>
+        </div>
+        <div class="input-group">
+            <label for="puerto">Puerto:</label>
+            <input type="text" id="puerto" name="puerto" required>
+        </div>
+        <div class="input-group">
+            <label for="generacion">Generación:</label>
+            <input type="text" id="generacion" name="generacion" required>
+        </div>
+        <div class="input-group">
+            <label for="memoriaram">Memoria Ram:</label>
+            <input type="text" id="memoriaram" name="memoriaram" required>
+        </div>
+        <div class="input-group">
+            <label for="memoriarom">Memoria Rom:</label>
+            <input type="text" id="memoriarom" name="memoriarom" required>
+        </div>
+        <div class="input-group">
+            <label for="categoria">Categoría:</label>
+            <select id="categoria" name="categoria" required>
+                <option value="">Seleccione una categoría</option>
+                <?php
+                require 'conexion.php';
+
+                try {
+                    // Consultar las categorías registradas
+                    $stmt = $conexion->prepare("SELECT id, descripcion FROM categorias");
+                    $stmt->execute();
+                    $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                    if ($categorias) {
+                        foreach ($categorias as $categoria) {
+                            echo "<option value='" . htmlspecialchars($categoria['id']) . "'>" . htmlspecialchars($categoria['descripcion']) . "</option>";
+                        }
+                    } else {
+                        echo "<option value='' disabled>No hay categorías registradas</option>";
+                    }
+                } catch (PDOException $e) {
+                    echo "<option value='' disabled>Error al cargar categorías</option>";
+                }
+                ?>
+            </select>
+        </div>
+        <button class="btn-submit" type="submit">Guardar Artículo</button>
+    </form>
+</div>
