@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Artículos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Lista de Artículos</h2>
+        <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalArticulo">Agregar Artículo</button>
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-articulos">
+                <!-- Aquí se cargarán los artículos -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal fade" id="modalArticulo" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nuevo Artículo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formArticulo">
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoria" class="form-label">Categoría</label>
+                            <input type="text" class="form-control" id="categoria" name="categoria" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cantidad" class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" id="cantidad" name="cantidad" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="precio" class="form-label">Precio</label>
+                            <input type="number" step="0.01" class="form-control" id="precio" name="precio" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Cargar artículos al iniciar
+            cargarArticulos();
+
+            // Manejar el envío del formulario
+            $("#formArticulo").submit(function (event) {
+                event.preventDefault();
+                
+                $.ajax({
+                    url: "guardar_articulo.php",
+                    type: "POST",
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        alert(response);
+                        $("#modalArticulo").modal("hide"); 
+                        $("#formArticulo")[0].reset();
+                        cargarArticulos();
+                    }
+                });
+            });
+
+            // Función para cargar los artículos en la tabla
+            function cargarArticulos() {
+                $.ajax({
+                    url: "listar_articulos.php",
+                    type: "GET",
+                    success: function (data) {
+                        $("#tabla-articulos").html(data);
+                    }
+                });
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
