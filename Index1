@@ -1,0 +1,65 @@
+<?php
+require 'conexion.php';
+
+// Buscar artículos por nombre o código
+$buscar = $_GET['buscar'] ?? '';
+$query = "SELECT * FROM articulos WHERE nombre LIKE :buscar OR codigo LIKE :buscar";
+$stmt = $conexion->prepare($query);
+$stmt->execute(['buscar' => "%$buscar%"]);
+$articulos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Artículos</title>
+</head>
+<body>
+
+<h2>Buscar Artículos</h2>
+<form method="GET">
+    <input type="text" name="buscar" placeholder="Buscar por nombre o código">
+    <button type="submit">Buscar</button>
+</form>
+
+<h2>Lista de Artículos</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th><th>Nombre</th><th>Código</th><th>Descripción</th><th>Marca</th><th>Modelo</th>
+            <th>Puerto</th><th>Generación</th><th>RAM</th><th>ROM</th><th>Categoría</th><th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php if ($articulos): ?>
+            <?php foreach ($articulos as $articulo): ?>
+                <tr>
+                    <td><?= htmlspecialchars($articulo['id']) ?></td>
+                    <td><?= htmlspecialchars($articulo['nombre']) ?></td>
+                    <td><?= htmlspecialchars($articulo['codigo']) ?></td>
+                    <td><?= htmlspecialchars($articulo['descripcion']) ?></td>
+                    <td><?= htmlspecialchars($articulo['marca']) ?></td>
+                    <td><?= htmlspecialchars($articulo['modelo']) ?></td>
+                    <td><?= htmlspecialchars($articulo['puerto']) ?></td>
+                    <td><?= htmlspecialchars($articulo['generacion']) ?></td>
+                    <td><?= htmlspecialchars($articulo['memoriaram']) ?></td>
+                    <td><?= htmlspecialchars($articulo['memoriarom']) ?></td>
+                    <td><?= htmlspecialchars($articulo['categoria']) ?></td>
+                    <td>
+                        <a href="editar_articulo.php?id=<?= $articulo['id'] ?>">Editar</a>
+                        <a href="eliminar_articulo.php?id=<?= $articulo['id'] ?>" onclick="return confirm('¿Eliminar este artículo?')">Eliminar</a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="12" style="text-align: center;">No se encontraron artículos.</td>
+            </tr>
+        <?php endif; ?>
+    </tbody>
+</table>
+
+</body>
+</html>
