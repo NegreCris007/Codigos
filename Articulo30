@@ -1,0 +1,173 @@
+<?php
+require 'conexion.php';
+
+// Buscar artículos
+$buscar = $_GET['buscar'] ?? '';
+$query = "SELECT * FROM articulos WHERE nombre LIKE :buscar OR codigo LIKE :buscar";
+$stmt = $conexion->prepare($query);
+$stmt->execute(['buscar' => "%$buscar%"]);
+$articulos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Artículos</title>
+</head>
+<body>
+
+<h2>Registrar Nuevo Artículo</h2>
+<form action="guardar_articulo.php" method="POST">
+    <input type="text" name="nombre" placeholder="Nombre" required>
+    <input type="text" name="codigo" placeholder="Código" required>
+    <input type="text" name="descripcion" placeholder="Descripción">
+    <input type="text" name="marca" placeholder="Marca">
+    <input type="text" name="modelo" placeholder="Modelo">
+    <input type="text" name="puerto" placeholder="Puerto">
+    <input type="text" name="generacion" placeholder="Generación">
+    <input type="text" name="memoriaram" placeholder="Memoria RAM">
+    <input type="text" name="memoriarom" placeholder="Memoria ROM">
+    <input type="text" name="categoria" placeholder="Categoría">
+    <button type="submit">Guardar</button>
+</form>
+
+<h2>Buscar Artículos</h2>
+<form method="GET">
+    <input type="text" name="buscar" placeholder="Buscar por nombre o código">
+    <button type="submit">Buscar</button>
+</form>
+
+<h2>Lista de Artículos</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th><th>Nombre</th><th>Código</th><th>Descripción</th><th>Marca</th><th>Modelo</th>
+            <th>Puerto</th><th>Generación</th><th>RAM</th><th>ROM</th><th>Categoría</th><th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($articulos as $articulo): ?>
+            <tr>
+                <td><?= htmlspecialchars($articulo['id']) ?></td>
+                <td><?= htmlspecialchars($articulo['nombre']) ?></td>
+                <td><?= htmlspecialchars($articulo['codigo']) ?></td>
+                <td><?= htmlspecialchars($articulo['descripcion']) ?></td>
+                <td><?= htmlspecialchars($articulo['marca']) ?></td>
+                <td><?= htmlspecialchars($articulo['modelo']) ?></td>
+                <td><?= htmlspecialchars($articulo['puerto']) ?></td>
+                <td><?= htmlspecialchars($articulo['generacion']) ?></td>
+                <td><?= htmlspecialchars($articulo['memoriaram']) ?></td>
+                <td><?= htmlspecialchars($articulo['memoriarom']) ?></td>
+                <td><?= htmlspecialchars($articulo['categoria']) ?></td>
+                <td>
+                    <a href="editar_articulo.php?id=<?= $articulo['id'] ?>">Editar</a>
+                    <a href="eliminar_articulo.php?id=<?= $articulo['id'] ?>" onclick="return confirm('¿Eliminar este artículo?')">Eliminar</a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+</body>
+</html>
+
+
+(guardar_articulo.php)
+
+<?php
+require 'conexion.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $sql = "INSERT INTO articulos (nombre, codigo, descripcion, marca, modelo, puerto, generacion, memoriaram, memoriarom, categoria)
+            VALUES (:nombre, :codigo, :descripcion, :marca, :modelo, :puerto, :generacion, :memoriaram, :memoriarom, :categoria)";
+    
+    $stmt = $conexion->prepare($sql);
+    $stmt->execute([
+        'nombre' => $_POST['nombre'],
+        'codigo' => $_POST['codigo'],
+        'descripcion' => $_POST['descripcion'],
+        'marca' => $_POST['marca'],
+        'modelo' => $_POST['modelo'],
+        'puerto' => $_POST['puerto'],
+        'generacion' => $_POST['generacion'],
+        'memoriaram' => $_POST['memoriaram'],
+        'memoriarom' => $_POST['memoriarom'],
+        'categoria' => $_POST['categoria']
+    ]);
+    
+    header("Location: index.php");
+}
+?>
+
+(editar_articulo.php)
+<?php
+require 'conexion.php';
+
+$id = $_GET['id'] ?? null;
+if (!$id) {
+    die("ID no válido.");
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $sql = "UPDATE articulos SET nombre=:nombre, codigo=:codigo, descripcion=:descripcion, marca=:marca, modelo=:modelo, 
+            puerto=:puerto, generacion=:generacion, memoriaram=:memoriaram, memoriarom=:memoriarom, categoria=:categoria
+            WHERE id=:id";
+    
+    $stmt = $conexion->prepare($sql);
+    $stmt->execute([
+        'id' => $id,
+        'nombre' => $_POST['nombre'],
+        'codigo' => $_POST['codigo'],
+        'descripcion' => $_POST['descripcion'],
+        'marca' => $_POST['marca'],
+        'modelo' => $_POST['modelo'],
+        'puerto' => $_POST['puerto'],
+        'generacion' => $_POST['generacion'],
+        'memoriaram' => $_POST['memoriaram'],
+        'memoriarom' => $_POST['memoriarom'],
+        'categoria' => $_POST['categoria']
+    ]);
+    
+    header("Location: index.php");
+} else {
+    $stmt = $conexion->prepare("SELECT * FROM articulos WHERE id=:id");
+    $stmt->execute(['id' => $id]);
+    $articulo = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+?>
+
+<!DOCTYPE html>
+<html>
+<head><title>Editar Artículo</title></head>
+<body>
+<h2>Editar Artículo</h2>
+<form method="POST">
+    <input type="text" name="nombre" value="<?= htmlspecialchars($articulo['nombre']) ?>" required>
+    <input type="text" name="codigo" value="<?= htmlspecialchars($articulo['codigo']) ?>" required>
+    <input type="text" name="descripcion" value="<?= htmlspecialchars($articulo['descripcion']) ?>">
+    <button type="submit">Actualizar</button>
+</form>
+</body>
+</html>
+
+
+
+(eliminar_articulo.php)
+
+
+
+<?php
+require 'conexion.php';
+
+$id = $_GET['id'] ?? null;
+if ($id) {
+    $stmt = $conexion->prepare("DELETE FROM articulos WHERE id=:id");
+    $stmt->execute(['id' => $id]);
+}
+
+header("Location: index.php");
+?>
+
