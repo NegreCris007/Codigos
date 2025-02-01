@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Artículos</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .btn-submit { background-color: #4CAF50; color: white; padding: 10px; border: none; cursor: pointer; }
+        .btn-delete { background-color: red; color: white; padding: 5px; border: none; cursor: pointer; }
+        #article-form { display: none; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<h1>Gestión de Artículos</h1>
+
+<!-- Botón para mostrar el formulario -->
+<button class="btn-submit" onclick="toggleArticuloForm()">Registrar Nuevo Artículo</button>
+
+<!-- Formulario de Artículo -->
+<div id="article-form">
+    <h2>Registrar Artículo</h2>
+    <form id="articleForm">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required>
+
+        <label for="codigo">Código:</label>
+        <input type="text" id="codigo" name="codigo" required>
+
+        <label for="descripcion">Descripción:</label>
+        <input type="text" id="descripcion" name="descripcion" required>
+
+        <label for="marca">Marca:</label>
+        <input type="text" id="marca" name="marca" required>
+
+        <label for="modelo">Modelo:</label>
+        <input type="text" id="modelo" name="modelo" required>
+
+        <label for="categoria">Categoría:</label>
+        <select id="categoria" name="categoria" required></select>
+
+        <button type="submit" class="btn-submit">Guardar Artículo</button>
+    </form>
+</div>
+
+<!-- Tabla de Artículos -->
+<h2>Lista de Artículos</h2>
+<div id="article-list"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    cargarCategorias();
+    cargarArticulos();
+});
+
+// Mostrar/Ocultar Formulario
+function toggleArticuloForm() {
+    let form = document.getElementById("article-form");
+    form.style.display = (form.style.display === "none") ? "block" : "none";
+}
+
+// Cargar Categorías dinámicamente
+function cargarCategorias() {
+    fetch('cargar_categorias.php')
+    .then(response => response.json())
+    .then(data => {
+        let select = document.getElementById("categoria");
+        select.innerHTML = '<option value="">Seleccione...</option>';
+        data.forEach(cat => {
+            let option = document.createElement("option");
+            option.value = cat.id;
+            option.textContent = cat.descripcion;
+            select.appendChild(option);
+        });
+    });
+}
+
+// Cargar Artículos con AJAX
+function cargarArticulos() {
+    fetch('listar_articulos.php')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById("article-list").innerHTML = data;
+    });
+}
+
+// Enviar Formulario con AJAX
+document.getElementById("articleForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+    let formData = new FormData(this);
+
+    fetch("procesar_articulo.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        alert(data);
+        cargarArticulos();
+        this.reset();
+    });
+});
+
+// Función para Eliminar Artículo
+function eliminarArticulo(id) {
+    if (confirm("¿Desea eliminar este artículo?")) {
+        fetch(`eliminar_articulo.php?id=${id}`)
+        .then(response => response.text())
+        .then(data => {
+            alert(data);
+            cargarArticulos();
+        });
+    }
+}
+</script>
+
+</body>
+</html>
