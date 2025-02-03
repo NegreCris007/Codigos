@@ -1,0 +1,34 @@
+CREATE DATABASE tienda_db;
+USE tienda_db;
+
+-- Tabla Organización
+CREATE TABLE organizacion (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    descripcion VARCHAR(255) NOT NULL,
+    createdate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    delete_at DATETIME NULL
+);
+
+-- Tabla Tienda
+CREATE TABLE tienda (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_orga INT NOT NULL,
+    descripcion VARCHAR(255) NOT NULL,
+    createdate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    delete_at DATETIME NULL,
+    FOREIGN KEY (id_orga) REFERENCES organizacion(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Tabla Puesto
+CREATE TABLE puesto (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_tienda INT NOT NULL,
+    descripcion VARCHAR(255) NOT NULL,
+    observacion TEXT NULL,
+    createdate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    delete_at DATETIME NULL,
+    FOREIGN KEY (id_tienda) REFERENCES tienda(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
